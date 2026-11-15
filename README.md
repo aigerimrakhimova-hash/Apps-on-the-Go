@@ -1,1 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Action 10 | Unit 3 | Apps on the Go</title>
+<style>
+:root{--bg:#f3f6fb;--ink:#182338;--muted:#65738b;--primary:#4057d6;--accent:#16a085;--card:#fff;--line:#dce3ef;--good:#e7f8ef;--bad:#fff0ed}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#eef2ff,#f7f9fc 55%,#e9f8f5);font-family:Arial,Helvetica,sans-serif;color:var(--ink);line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:22px 16px 50px}
+header{background:#202d59;color:white;border-radius:22px;padding:28px 30px;margin-bottom:18px;box-shadow:0 12px 30px #26376522}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:#bfcaff;font-weight:700}
+h1{font-size:clamp(1.7rem,4vw,2.6rem);margin:6px 0 4px}header p{margin:0;color:#e1e7ff}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.stat{background:#ffffff18;border:1px solid #ffffff2b;border-radius:12px;padding:8px 13px;font-size:.9rem}
+.progressbox{background:#fff;border-radius:14px;padding:14px 17px;margin-bottom:18px;border:1px solid var(--line)}
+.progressline{height:9px;background:#e8ecf5;border-radius:20px;overflow:hidden;margin-top:8px}#progress{height:100%;width:0;background:linear-gradient(90deg,var(--primary),#19b99a);transition:width .25s}
+.question{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:19px 20px;margin:14px 0;box-shadow:0 5px 16px #24395b0a}
+.qtop{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.qnum{font-weight:800;color:var(--primary);font-size:.9rem}
+.tag{font-size:.75rem;color:#53627c;background:#edf1fa;padding:4px 9px;border-radius:20px}.prompt{font-size:1.05rem;font-weight:700;margin:7px 0 13px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}.option{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:10px 12px;cursor:pointer;transition:.15s}
+.option:hover{border-color:#8291e8;background:#f7f8ff}.option input{margin-top:4px;accent-color:var(--primary)}
+input.gap{width:100%;padding:12px 13px;border:1px solid #cbd4e4;border-radius:10px;font-size:1rem;outline:none}
+input.gap:focus{border-color:var(--primary);box-shadow:0 0 0 3px #4057d61c}.hint{font-size:.86rem;color:var(--muted);margin-top:6px}
+.feedback{display:none;margin-top:12px;border-radius:10px;padding:10px 12px;font-size:.92rem}.feedback.good{display:block;background:var(--good);color:#176b45}.feedback.bad{display:block;background:var(--bad);color:#9a392b}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}
+button{border:0;border-radius:12px;padding:13px 20px;font-size:1rem;font-weight:700;cursor:pointer}
+.primary{background:var(--primary);color:white}.secondary{background:#e7ebf5;color:#263653}.primary:hover{background:#3046c1}.secondary:hover{background:#dce3f1}
+#result{display:none;background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:20px;text-align:center}
+.score{font-size:2.6rem;font-weight:800;color:var(--primary);margin:4px}
+.small{color:var(--muted);font-size:.92rem}.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:25px}
+@media(max-width:650px){.wrap{padding:12px 10px 32px}header{padding:22px 19px;border-radius:17px}.options{grid-template-columns:1fr}.question{padding:16px}.qtop{align-items:flex-start}}
+@media print{body{background:white}.actions,footer{display:none}.question{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Action 10 · Unit 3 · Lesson B</div>
+  <h1>Apps on the Go</h1>
+  <p>Vocabulary Challenge · B1–B2</p>
+  <div class="stats"><div class="stat">20 questions</div><div class="stat">English definitions</div><div class="stat">Instant feedback</div><div class="stat">Works offline</div></div>
+</header>
+<div class="progressbox">
+  <strong id="progressText">0 of 20 answered</strong>
+  <div class="progressline"><div id="progress"></div></div>
+</div>
+<main id="quiz"></main>
+<div class="actions">
+  <button class="primary" id="checkBtn">Check my answers</button>
+  <button class="secondary" id="restartBtn">Restart</button>
+</div>
+<section id="result" aria-live="polite">
+  <div class="eyebrow" style="color:#6576c9">Your result</div>
+  <div class="score" id="scoreText">0 / 20</div>
+  <h2 id="resultTitle">Keep practising!</h2>
+  <p id="resultMessage"></p>
+  <button class="primary" onclick="restartQuiz()">Try again</button>
+</section>
+<footer>Action 10 · Apps on the Go · Self-checking vocabulary quiz</footer>
+</div>
+<script>
+const questions = [
+{type:"Definition",q:"Which term means a small software program designed to perform a particular task on a mobile device?",opts:["application","operating system","web browser","attachment"],a:0,why:"An application, or app, is a software program created to perform one or more specific tasks."},
+{type:"Definition",q:"What do we call the process of moving a file or data from the internet to your device?",opts:["uploading","downloading","streaming","browsing"],a:1,why:"Downloading means transferring data from a remote system or the internet to your own device."},
+{type:"Definition",q:"Which word describes software that is available at no cost to the user?",opts:["wireless","portable","freeware","outdated"],a:2,why:"Freeware is software that users can access and use without paying for it."},
+{type:"Definition",q:"What is a notification?",opts:["A message or alert that informs you about an update or activity","A tool for increasing screen brightness","A password used to unlock a phone","A file stored in the cloud"],a:0,why:"A notification is an alert that tells a user about an event, message, reminder or update."},
+{type:"Definition",q:"Which phrase means that a device or app is connected to the internet?",opts:["out of order","up to date","offline","online"],a:3,why:"Online means connected to a network, especially the internet."},
+{type:"Vocabulary in context",q:"I need to _____ the latest version of the app because the old one keeps crashing.",opts:["install","ignore","delete","share"],a:0,why:"Install means to put software onto a device so that it can be used."},
+{type:"Vocabulary in context",q:"This fitness app can _____ your daily steps and show your progress.",opts:["avoid","track","attach","charge"],a:1,why:"Track means to follow or record the development or amount of something over time."},
+{type:"Vocabulary in context",q:"The app is very _____: its menus are clear and new users can learn how to use it quickly.",opts:["complicated","reliable","user-friendly","unavailable"],a:2,why:"User-friendly describes something that is easy for people to understand and use."},
+{type:"Vocabulary in context",q:"Make sure you _____ your photos regularly so you do not lose them if your phone breaks.",opts:["back up","switch off","log out","scroll down"],a:0,why:"To back up files means to make an extra copy so they can be restored if the originals are lost."},
+{type:"Vocabulary in context",q:"The map app uses GPS to _____ your current position.",opts:["protect","locate","connect","update"],a:1,why:"Locate means to find or identify the position of a person or object."},
+{type:"Gap fill",q:"You need a strong _____ to protect your personal account. (A secret combination of characters used to access an account.)",answer:["password"],why:"A password is a secret word or combination of characters used to verify a user's identity."},
+{type:"Gap fill",q:"The app is not working because there is no internet _____. (A connection to a network.)",answer:["connection"],why:"An internet connection links your device to the internet."},
+{type:"Gap fill",q:"I use a calendar app to set a _____ for important tasks. (A reminder that something should be done at a particular time.)",answer:["reminder"],why:"A reminder helps you remember an event or task that needs attention."},
+{type:"Gap fill",q:"The new update has improved the app's _____ and fixed several problems. (The way a system or program performs.)",answer:["performance"],why:"Performance refers to how well or efficiently an app or device works."},
+{type:"Gap fill",q:"This app lets users _____ documents with classmates in real time. (To work together on a shared task.)",answer:["collaborate"],why:"Collaborate means to work together with other people to achieve a shared goal."},
+{type:"Vocabulary in context",q:"Before you share your location, check the app's privacy _____.",opts:["settings","screens","signals","batteries"],a:0,why:"Privacy settings control who can see or use your personal information."},
+{type:"Vocabulary in context",q:"The app is _____ with both Android and iOS devices, so most students can use it.",opts:["dependent","compatible","automatic","private"],a:1,why:"Compatible means able to work correctly with another device or system."},
+{type:"Gap fill",q:"A _____ is a weakness in a computer system or app that may cause problems. (A fault or imperfection.)",answer:["bug"],why:"A bug is an error or fault in software that can cause unexpected behaviour."},
+{type:"Vocabulary in context",q:"If an app asks for access to your microphone, you should check its _____ before agreeing.",opts:["battery","purpose","permissions","download"],a:2,why:"Permissions are the rights an app requests to use features or information on your device."},
+{type:"Gap fill",q:"When you _____, you end your session and leave your account. (To sign out.)",answer:["log out","logout","sign out","signout"],why:"To log out or sign out means to end an active account session, especially on a shared device."}
+];
 
+const quiz = document.getElementById("quiz");
+function renderQuiz(){
+  quiz.innerHTML = "";
+  questions.forEach((q,i)=>{
+    const card=document.createElement("section"); card.className="question"; card.id="q"+i;
+    let content="";
+    if(q.opts){
+      content='<div class="options">'+q.opts.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}"><span><strong>${String.fromCharCode(65+j)}.</strong> ${o}</span></label>`).join("")+'</div>';
+    } else {
+      content=`<input class="gap" id="answer${i}" type="text" autocomplete="off" placeholder="Type your answer in English"><div class="hint">Enter the missing word or phrase.</div>`;
+    }
+    card.innerHTML=`<div class="qtop"><span class="qnum">QUESTION ${i+1}</span><span class="tag">${q.type}</span></div><div class="prompt">${q.q}</div>${content}<div class="feedback" id="fb${i}"></div>`;
+    quiz.appendChild(card);
+  });
+  quiz.addEventListener("change",updateProgress);
+  quiz.addEventListener("input",updateProgress);
+  updateProgress();
+}
+function normalise(s){return s.trim().toLowerCase().replace(/[.!?]/g,"").replace(/\s+/g," ")}
+function getAnswer(i){
+  const q=questions[i];
+  if(q.opts){const selected=document.querySelector(`input[name="q${i}"]:checked`);return selected?Number(selected.value):null}
+  return document.getElementById("answer"+i).value;
+}
+function isAnswered(i){const a=getAnswer(i);return a!==null && String(a).trim()!==""}
+function updateProgress(){
+  let n=questions.filter((q,i)=>isAnswered(i)).length;
+  document.getElementById("progressText").textContent=`${n} of 20 answered`;
+  document.getElementById("progress").style.width=(n/20*100)+"%";
+}
+function checkAnswers(){
+  let score=0;
+  questions.forEach((q,i)=>{
+    const given=getAnswer(i), fb=document.getElementById("fb"+i);
+    let correct=false, answerText="";
+    if(q.opts){correct=given===q.a;answerText=q.opts[q.a]}
+    else {correct=given!==null && q.answer.some(a=>normalise(given)===normalise(a));answerText=q.answer[0]}
+    if(correct)score++;
+    fb.className="feedback "+(correct?"good":"bad");
+    fb.innerHTML=(correct?"<strong>Correct!</strong> ":"<strong>Not quite.</strong> ")+
+      (correct?"":"<strong>Correct answer: "+answerText+".</strong> ")+q.why;
+  });
+  const result=document.getElementById("result"); result.style.display="block";
+  document.getElementById("scoreText").textContent=score+" / 20";
+  const pct=score/20*100;
+  document.getElementById("resultTitle").textContent=pct>=90?"Excellent work!":pct>=75?"Great job!":pct>=50?"Good effort!":"Keep practising!";
+  document.getElementById("resultMessage").textContent=
+    pct>=90?"You have an excellent understanding of the vocabulary.":pct>=75?"You know most of the key terms. Review the explanations to strengthen your knowledge.":pct>=50?"You are making progress. Read the explanations and try the quiz again.":"Review the vocabulary definitions and practise again. You can improve with each attempt.";
+  result.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function restartQuiz(){
+  renderQuiz();document.getElementById("result").style.display="none";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.getElementById("checkBtn").addEventListener("click",checkAnswers);
+document.getElementById("restartBtn").addEventListener("click",restartQuiz);
+renderQuiz();
+</script>
+</body>
+</html>
